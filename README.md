@@ -1,4 +1,32 @@
-# Supply-Blockchain
+## Requirements
+1. Python 3.8
+2. Pipenv
+3. Git
+
+## Setup
+
+### One-time setup commands
+```sh
+1. sudo apt-get install pipenv  # if not installed already
+2. git clone https://github.com/geetesh-gupta/VanetBlockchain
+3. cd VanetBlockchain
+4. pipenv install
+5. pipenv shell
+```
+
+### Daily workspace setup
+```sh
+1. Go the VanetBlockchain folder
+2. Run `pipenv shell`
+```
+
+### To run the simulation
+```sh
+python3 Simulation.py  
+# if you have `python` set to `python3` in terminal, you can use `python` instead of `python3` in the command
+```
+
+<!-- # Supply-Blockchain
 Blockchain has become a trending topic with the increasing interest of public in crypto-currency such as Bitcoin :moneybag:. This project demonstrates a use-case of blockchain in IoT. This use-case is based on the [Christidis, K. and Devetsikiotis, M., 2016. Blockchains and smart contracts for the internet of things. IEEE Access, 4, pp.2292-2303.](http://ieeexplore.ieee.org/abstract/document/7467408/)
 
 # Asset Tracking
@@ -33,4 +61,4 @@ The program looks at the functionality that is mandatory for a asset tracking bl
 <p align="center"> <img src = 'images/step3.png' </p>
 <p align="center"> <img src = 'images/step4.png' </p>
 <p align="center"> <img src = 'images/step5.png' </p>
-<p align="center"> <img src = 'images/step6.png' </p>
+<p align="center"> <img src = 'images/step6.png' </p> -->
