@@ -61,7 +61,9 @@ class Node:
     def move(self):
         self.x += self.dx
         self.y += self.dy
-        print(f"{self.server.server_address} moved to {self.x} {self.y}")
+        print(
+            f"Node {self.server.server_address[1]} moved to {self.x} {self.y}"
+        )
 
 
 class StaticNode(Node):
