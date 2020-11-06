@@ -76,6 +76,12 @@ class StaticNode(Node):
         super().__init__(x, y, 0, 0, range_radius)
 
 
+class Accident(StaticNode):
+
+    def __init__(self, x, y):
+        super().__init__(x, y, 0)
+
+
 if __name__ == "__main__":
     nodes = [Node(0, 0, 0, 0) for _ in range(2)]
     staticnodes = [StaticNode(0, 0) for _ in range(2)]
