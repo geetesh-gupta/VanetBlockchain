@@ -5,16 +5,18 @@ import uuid
 import socketserver
 from Sockets import ThreadedTCPRequestHandler, ThreadedTCPServer, send_msg_func, create_msg
 import json
+from Functions import func_per_second, check_within_range, get_distance
 
 
 class Node:
 
-    def __init__(self, x, y, dx, dy):
+    def __init__(self, x, y, dx, dy, range_radius=50):
         self.id = uuid.uuid4()
         self.x = x
         self.y = y
         self.dx = dx
         self.dy = dy
+        self.range = range_radius
         self.server = None
         self.start_server()
 
@@ -52,11 +54,20 @@ class Node:
                     send_msg_func, recv_addr, msg)
                 # print(send_msg_thread.result())
 
+    def stop_moving(self):
+        self.dx = 0
+        self.dy = 0
+
+    def move(self):
+        self.x += self.dx
+        self.y += self.dy
+        print(f"{self.server.server_address} moved to {self.x} {self.y}")
+
 
 class StaticNode(Node):
 
-    def __init__(self, x, y):
-        super().__init__(x, y, 0, 0)
+    def __init__(self, x, y, range_radius=50):
+        super().__init__(x, y, 0, 0, range_radius)
 
 
 if __name__ == "__main__":
