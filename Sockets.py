@@ -5,6 +5,13 @@ import json
 
 
 class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
+    """
+    The request handler class for our server.
+
+    It is instantiated once per connection to the server, and must
+    override the handle() method to implement communication to the
+    client.
+    """
 
     def handle(self):
         data = str(self.request.recv(1024), 'ascii')
@@ -17,10 +24,18 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
 
 
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
+    """
+    Build asynchronous handler, non-blocking server
+    """
     pass
 
 
 def send_msg_func(recv_address, msg):
+    """
+    Function used by socket client to send messages.
+    Suggested to use create_msg function to format the message 
+    before passing the msg to this function
+    """
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect(recv_address)
     try:
@@ -36,6 +51,9 @@ def send_msg_func(recv_address, msg):
 
 
 def create_msg(server_address, msg):
+    """
+    Default message format for the socket communication
+    """
     return json.dumps({
         "server_address": server_address,
         "msg": msg
