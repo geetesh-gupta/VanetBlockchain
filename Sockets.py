@@ -35,5 +35,12 @@ def send_msg_func(recv_address, msg):
         sock.close()
 
 
+def create_msg(server_address, msg):
+    return json.dumps({
+        "server_address": server_address,
+        "msg": msg
+    })
+
+
 if __name__ == "__main__":
     send_msg_func(('localhost', int(input())), "HI")

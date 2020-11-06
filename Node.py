@@ -3,7 +3,7 @@ import threading
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 import uuid
 import socketserver
-from Sockets import ThreadedTCPRequestHandler, ThreadedTCPServer, send_msg_func
+from Sockets import ThreadedTCPRequestHandler, ThreadedTCPServer, send_msg_func, create_msg
 import json
 
 
@@ -62,12 +62,6 @@ class StaticNode(Node):
 if __name__ == "__main__":
     nodes = [Node(0, 0, 0, 0) for _ in range(2)]
     staticnodes = [StaticNode(0, 0) for _ in range(2)]
-
-    def create_msg(server_address, msg):
-        return json.dumps({
-            "server_address": server_address,
-            "msg": msg
-        })
 
     nodes[0].send_msg(nodes[1].server.server_address,
                       create_msg(nodes[0].server.server_address, "Hi"))
