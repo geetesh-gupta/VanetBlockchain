@@ -22,8 +22,27 @@
 
 ### To run the simulation
 ```sh
-python3 Simulation.py  
+python3 Simulation.py
 # if you have `python` set to `python3` in terminal, you can use `python` instead of `python3` in the command
+```
+
+### Project Structure
+|     File Name         |    Description    |
+| -----------------     | ----------------- |
+| main.py | Main entry file, currently not updated |
+| Simulation.py | Contains the class for Simulation |
+| Node.py | Contains the classes for Moving Nodes, Static Nodes and Accidents |
+| Sockets.py | Contains client-server messaging socket-based functions | 
+| Functions.py | Contains common utility functions |
+| BlockChain.py | Contains the class for BlockChain |             
+| Block.py | Contains the class for Blocks |                  
+| PoWAlgo.py | Contains the code for Proof of Work based calculations |
+| Transaction.py | Blockchain Transactions and smart contracts |
+|||
+
+### Note !!!
+```
+Block.py, BlockChain.py, Transaction.py, PoWAlgo.py and main.py currently contains the code from Supply product example. So, that example can be tested by running `main.py`.
 ```
 
 <!-- # Supply-Blockchain
