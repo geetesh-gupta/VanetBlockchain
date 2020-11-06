@@ -26,6 +26,10 @@ class Node:
     def get_velocity(self):
         return {'dx': self.dx, 'dy': self.dy}
 
+    def reverse_direction(self):
+        self.dx = -self.dx
+        self.dy = -self.dy
+
     def set_velocity(self, dx, dy):
         self.dx = dx
         self.dy = dy
@@ -61,9 +65,9 @@ class Node:
     def move(self):
         self.x += self.dx
         self.y += self.dy
-        print(
-            f"Node {self.server.server_address[1]} moved to {self.x} {self.y}"
-        )
+        # print(
+        #     f"Node {self.server.server_address[1]} moved to {self.x} {self.y}"
+        # )
 
 
 class StaticNode(Node):
