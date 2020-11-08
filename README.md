@@ -45,6 +45,12 @@ python3 Simulation.py
 Block.py, BlockChain.py, Transaction.py, PoWAlgo.py and main.py currently contains the code from Supply product example. So, that example can be tested by running `main.py`.
 ```
 
+### Blockchain Setup Posts
+Follow these posts if customisation and reference is needed for blockchain part:
+- [Private PoA Blockchain Setup](https://hackernoon.com/setup-your-own-private-proof-of-authority-ethereum-network-with-geth-9a0a3750cda8)
+- [Python-based RPC calls from the blockchain](https://medium.com/hackernoon/ethereum-create-raw-json-rpc-requests-with-python-for-deploying-and-transacting-with-a-smart-7ceafd6790d9)
+
+
 <!-- # Supply-Blockchain
 Blockchain has become a trending topic with the increasing interest of public in crypto-currency such as Bitcoin :moneybag:. This project demonstrates a use-case of blockchain in IoT. This use-case is based on the [Christidis, K. and Devetsikiotis, M., 2016. Blockchains and smart contracts for the internet of things. IEEE Access, 4, pp.2292-2303.](http://ieeexplore.ieee.org/abstract/document/7467408/)
 
