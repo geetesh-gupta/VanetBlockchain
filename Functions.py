@@ -27,7 +27,8 @@ def func_per_second(fn, timeframe=1, *args):
     starttime = curtime()
     while True:
         fn(*args)
-        time.sleep((1000.0 * timeframe - ((curtime() - starttime) % (1000.0 * timeframe))) / 1000)
+        time.sleep((1000.0 * timeframe - ((curtime() - starttime) %
+                                          (1000.0 * timeframe))) / 1000)
 
 
 def get_distance(x1, y1, x2, y2):
@@ -73,9 +74,20 @@ def decrypt_data(data, key):
     return decrypted_data.decode()
 
 
+def list_set_diff(lis, sett):
+    return (list(list(set(lis)-sett)) + list(sett-set(lis)))
+
+
 if __name__ == "__main__":
-    pri_key = RSA.generate(2048)
-    encrypted_data = encrypt_data("Hello", pri_key.publickey())
-    decrypted_data = decrypt_data(encrypted_data, pri_key)
-    print(encrypted_data)
-    print(decrypted_data)
+    # pri_key = RSA.generate(2048)
+    # encrypted_data = encrypt_data("Hello", pri_key.publickey())
+    # decrypted_data = decrypt_data(encrypted_data, pri_key)
+    # print(encrypted_data)
+    # print(decrypted_data)
+    from Node import Node
+    nodes = [Node(100, 100, 10, 10), Node(100, 100, 10, 10),
+             Node(100, 100, 10, 10), Node(100, 100, 10, 10)]
+    print(nodes)
+    n_nodes = {nodes[0], nodes[1]}
+    print(n_nodes)
+    print(list_set_diff(nodes, n_nodes))

@@ -1,7 +1,7 @@
 from Node import Node, StaticNode, Accident
 from random import randint, choice
 from Sockets import create_msg
-from Functions import func_per_second, check_dict_within_range, get_dict_distance, encrypt_data, decrypt_data
+from Functions import func_per_second, check_dict_within_range, get_dict_distance, encrypt_data, decrypt_data, list_set_diff
 from threading import Thread, Event
 import json
 import signal
@@ -10,11 +10,11 @@ import signal
 class Simulation:
 
     def __init__(self, x_range, y_range, num_nodes, num_rsus):
-        self.nodes = [Node(250, 250, 10, 10), Node(210, 210, 10, 10)]+[
+        self.nodes = [Node(250, 250, 10, 10), Node(210, 210, 10, 10), Node(270, 270, 5, 5), Node(320, 320, 5, 5)]+[
             Node(
                 randint(0, x_range), randint(0, y_range),
                 randint(0, 10), randint(0, 10)
-            ) for _ in range(num_nodes-2)]
+            ) for _ in range(num_nodes-4)]
         self.rsus = [
             StaticNode(
                 choice([0, x_range, x_range // 2]),
@@ -23,6 +23,7 @@ class Simulation:
         self.x_range = x_range
         self.y_range = y_range
         self.accidents = []
+        self.accident_nodes = set()
 
     def simulate_send_msg(self):
         """
@@ -67,6 +68,7 @@ class Simulation:
         """
 
         func_per_second(self.frame)
+        func_per_second(self.reset_nearby_nodes, 10)
 
     def move_vehicles(self):
         """
@@ -74,6 +76,10 @@ class Simulation:
         """
         for node in self.nodes:
             node.move()
+
+    def reset_nearby_nodes(self):
+        for node in self.accident_nodes:
+            node.reset_nearby_nodes()
 
     def simulate_accident(self):
         """
@@ -99,10 +105,13 @@ class Simulation:
         # Reverse the node's direction to take different route
         node.reverse_direction()
 
-        nearby_node = self.get_nearby_node(node, self.nodes + self.rsus)
+        nodes_list = list_set_diff(self.nodes + self.rsus, node.nearby_nodes)
+        nearby_node = self.get_nearby_node(node, nodes_list)
         if not nearby_node:
             return
 
+        self.accident_nodes.add(node)
+        node.add_nearby_node(nearby_node)
 
         msg = f"Accident at ({accident.get_pos()['x']}, {accident.get_pos()['y']})"
         nearby_node_public_key = Node.retrieve_public_key(nearby_node.id)
@@ -122,7 +131,6 @@ class Simulation:
         # )
 
         # Recurse on nearby node
-        # TODO: Devise a way to prevent calling previous node
         self.action_on_accident(nearby_node, accident)
 
     def check_accidents_nearby(self):
@@ -179,7 +187,7 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal_handler)
 
     # Simulation
-    simulation = Simulation(600, 600, 4, 3)
+    simulation = Simulation(600, 600, 6, 3)
 
     # Display Coordinates of nodes
     simulation.display_coordinates()

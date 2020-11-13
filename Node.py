@@ -21,6 +21,7 @@ class Node:
         self.range = range_radius
         self.server = None
         self._private_key = None
+        self.nearby_nodes = set()
         self.start_server()
         self.authenticate()
 
@@ -74,6 +75,12 @@ class Node:
         # print(
         #     f"Node {self.server.server_address[1]} moved to {self.x} {self.y}"
         # )
+
+    def reset_nearby_nodes(self):
+        self.nearby_nodes = set()
+
+    def add_nearby_node(self, node):
+        self.nearby_nodes.add(node)
 
     def authenticate(self):
         private_key = RSA.generate(2048)
