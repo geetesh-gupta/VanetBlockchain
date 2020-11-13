@@ -1,24 +1,28 @@
 import socket
 import threading
+import os
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 import uuid
 import socketserver
 from Sockets import ThreadedTCPRequestHandler, ThreadedTCPServer, send_msg_func, create_msg
 import json
 from Functions import func_per_second, check_within_range, get_distance
+from Crypto.PublicKey import RSA
 
 
 class Node:
 
-    def __init__(self, x, y, dx, dy, range_radius=50):
-        self.id = uuid.uuid4()
+    def __init__(self, x, y, dx, dy, range_radius=70):
+        self.id = None
         self.x = x
         self.y = y
         self.dx = dx
         self.dy = dy
         self.range = range_radius
         self.server = None
+        self._private_key = None
         self.start_server()
+        self.authenticate()
 
     def get_pos(self):
         return {'x': self.x, 'y': self.y}
@@ -39,7 +43,9 @@ class Node:
 
         self.server = ThreadedTCPServer(
             (HOST, PORT), ThreadedTCPRequestHandler)
-        print(f"Server started on port: {self.server.server_address[1]}")
+        self.server.node = self
+        # print(f"Server started on port: {self.server.server_address[1]}")
+        self.id = self.server.server_address[1]
         # Start a thread with the server -- that thread will then start one
         # more thread for each request
         server_thread = threading.Thread(target=self.server.serve_forever)
@@ -68,6 +74,24 @@ class Node:
         # print(
         #     f"Node {self.server.server_address[1]} moved to {self.x} {self.y}"
         # )
+
+    def authenticate(self):
+        private_key = RSA.generate(2048)
+        self._private_key = private_key
+        self.add_public_key_to_vca(private_key.publickey())
+
+    def add_public_key_to_vca(self, key):
+        with open(f'vca/{self.id}.txt', 'wb') as f:
+            f.write(key.export_key())
+
+    @staticmethod
+    def retrieve_public_key(node_id):
+        with open(f'vca/{node_id}.txt', 'rb') as f:
+            return RSA.import_key(f.read())
+
+    def __del__(self):
+        if os.path.exists(f'vca/{self.id}.txt'):
+            os.remove(f'vca/{self.id}.txt')
 
 
 class StaticNode(Node):

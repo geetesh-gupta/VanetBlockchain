@@ -1,7 +1,7 @@
 from Node import Node, StaticNode, Accident
 from random import randint, choice
 from Sockets import create_msg
-from Functions import func_per_second, check_dict_within_range, get_dict_distance
+from Functions import func_per_second, check_dict_within_range, get_dict_distance, encrypt_data, decrypt_data
 from threading import Thread, Event
 import json
 import signal
@@ -10,11 +10,11 @@ import signal
 class Simulation:
 
     def __init__(self, x_range, y_range, num_nodes, num_rsus):
-        self.nodes = [
+        self.nodes = [Node(250, 250, 10, 10), Node(210, 210, 10, 10)]+[
             Node(
                 randint(0, x_range), randint(0, y_range),
                 randint(0, 10), randint(0, 10)
-            ) for _ in range(num_nodes)]
+            ) for _ in range(num_nodes-2)]
         self.rsus = [
             StaticNode(
                 choice([0, x_range, x_range // 2]),
@@ -79,7 +79,7 @@ class Simulation:
         """
         Creates accident objects to simulate accident scenarios
         """
-        self.accidents.append(Accident(500, 500))
+        self.accidents.append(Accident(300, 300))
         # self.accidents.append(Accident(250, 500))
         # self.accidents.append(Accident(500, 250))
         # self.accidents.append(Accident(750, 500))
@@ -103,14 +103,23 @@ class Simulation:
         if not nearby_node:
             return
 
+
+        msg = f"Accident at ({accident.get_pos()['x']}, {accident.get_pos()['y']})"
+        nearby_node_public_key = Node.retrieve_public_key(nearby_node.id)
+        encrypted_msg = encrypt_data(msg, nearby_node_public_key)
+
         # Send message to the nearby node
         node.send_msg(
             nearby_node.server.server_address,
-            create_msg(
-                node.server.server_address,
-                f"Accident at ({accident.get_pos()['x']}, {accident.get_pos()['y']})"
-            )
+            create_msg(node.server.server_address, encrypted_msg, 2)
         )
+
+        # # Create transaction of the sent message
+        # create_txn(
+        #     node.id,
+        #     nearby_node.id,
+        #     encrypted_msg
+        # )
 
         # Recurse on nearby node
         # TODO: Devise a way to prevent calling previous node
@@ -170,7 +179,7 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal_handler)
 
     # Simulation
-    simulation = Simulation(1000, 1000, 7, 3)
+    simulation = Simulation(600, 600, 4, 3)
 
     # Display Coordinates of nodes
     simulation.display_coordinates()

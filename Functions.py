@@ -1,6 +1,10 @@
 import time
 import math
 from datetime import datetime
+from Crypto.Cipher import PKCS1_OAEP
+from Crypto.PublicKey import RSA
+import binascii
+import ast
 
 
 def curtime():
@@ -12,7 +16,7 @@ def curtime():
     return dt.microsecond
 
 
-def func_per_second(fn, *args):
+def func_per_second(fn, timeframe=1, *args):
     """
     Runs a function every second
 
@@ -23,7 +27,7 @@ def func_per_second(fn, *args):
     starttime = curtime()
     while True:
         fn(*args)
-        time.sleep((1000.0 - ((curtime() - starttime) % 1000.0)) / 1000)
+        time.sleep((1000.0 * timeframe - ((curtime() - starttime) % (1000.0 * timeframe))) / 1000)
 
 
 def get_distance(x1, y1, x2, y2):
@@ -54,3 +58,24 @@ def check_dict_within_range(pos_dict1, range1, pos_dict2):
     and represent positions
     """
     return check_within_range(pos_dict1['x'], pos_dict1['y'], range1, pos_dict2['x'], pos_dict2['y'])
+
+
+def encrypt_data(data, key):
+    cipher = PKCS1_OAEP.new(key)
+    encrypted_data = cipher.encrypt(data.encode())
+    return binascii.hexlify(encrypted_data).decode()
+
+
+def decrypt_data(data, key):
+    cipher = PKCS1_OAEP.new(key)
+    decrypted_data = cipher.decrypt(
+        eval(str(binascii.unhexlify(data.encode()))))
+    return decrypted_data.decode()
+
+
+if __name__ == "__main__":
+    pri_key = RSA.generate(2048)
+    encrypted_data = encrypt_data("Hello", pri_key.publickey())
+    decrypted_data = decrypt_data(encrypted_data, pri_key)
+    print(encrypted_data)
+    print(decrypted_data)
