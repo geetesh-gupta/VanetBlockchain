@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "/home/ggunix/.local/share/virtualenvs/VanetBlockChain-Ur-6kn8Z/bin/python",
+    "python.pythonPath": "/home/ggunix/.virtualenvs/VanetBlockChain-Ur-6kn8Z/bin/python",
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true
 }

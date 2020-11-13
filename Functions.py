@@ -77,6 +77,15 @@ def decrypt_data(data, key):
 def list_set_diff(lis, sett):
     return (list(list(set(lis)-sett)) + list(sett-set(lis)))
 
+def to_hex(s):
+    liss = [hex(ord(c))[2:].zfill(2) for c in s]
+    ans = "".join(liss)
+    return ans
+
+#convert hex repr to string
+def to_str(s):
+    return s and chr(atoi(s[:2], base=16)) + toStr(s[2:]) or ''
+
 
 if __name__ == "__main__":
     # pri_key = RSA.generate(2048)
