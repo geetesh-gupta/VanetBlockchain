@@ -8,7 +8,7 @@ contract CAContract {
     function performTransaction(
         uint message,
         uint senderId,
-         uint receiverId
+        uint receiverId
     ) public returns (TransactionContract) {
         ++counter;
         TransactionContract contr = new TransactionContract(message, senderId, receiverId, counter);

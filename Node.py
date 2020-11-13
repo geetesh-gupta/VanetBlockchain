@@ -23,6 +23,7 @@ class Node:
         self._private_key = None
         self.nearby_nodes = set()
         self.start_server()
+        print("--------------------------------------------------------------------------")
         self.authenticate()
 
     def get_pos(self):
@@ -83,9 +84,11 @@ class Node:
         self.nearby_nodes.add(node)
 
     def authenticate(self):
+        print(f"Generating key pair for {self.id}")
         private_key = RSA.generate(2048)
         self._private_key = private_key
         self.add_public_key_to_vca(private_key.publickey())
+        print(f"Public key for {self.id}: {private_key.publickey()}")
 
     def add_public_key_to_vca(self, key):
         with open(f'vca/{self.id}.txt', 'wb') as f:

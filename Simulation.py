@@ -5,7 +5,8 @@ from Functions import func_per_second, check_dict_within_range, get_dict_distanc
 from threading import Thread, Event
 import json
 import signal
-
+from Transactions import get_bytecode, deploy_contract, send_txn, get_cur_nonce
+import time
 
 class Simulation:
 
@@ -24,6 +25,9 @@ class Simulation:
         self.y_range = y_range
         self.accidents = []
         self.accident_nodes = set()
+        self.ca_contract_address = None
+        self.txn_count = get_cur_nonce()
+        time.sleep(1)
 
     def simulate_send_msg(self):
         """
@@ -66,7 +70,7 @@ class Simulation:
         Entry function to start the simulation.
         Changes frame every second.
         """
-
+        self.ca_contract_address = deploy_contract( get_bytecode())
         func_per_second(self.frame)
         func_per_second(self.reset_nearby_nodes, 10)
 
@@ -123,12 +127,23 @@ class Simulation:
             create_msg(node.server.server_address, encrypted_msg, 2)
         )
 
+        # self.transactions.append({
+        #     senderId: node.id,
+        #     receiverId: nearby_node.id,
+        #     msg: encrypted_msg,
+        #     contractAddress: self.ca_contract_address
+        # })
+
+        self.txn_count += 1
+        
         # # Create transaction of the sent message
-        # create_txn(
-        #     node.id,
-        #     nearby_node.id,
-        #     encrypted_msg
-        # )
+        send_txn(
+            node.id,
+            nearby_node.id,
+            encrypted_msg,
+            self.ca_contract_address,
+            self.txn_count
+        )
 
         # Recurse on nearby node
         self.action_on_accident(nearby_node, accident)
@@ -172,6 +187,14 @@ class Simulation:
                 min_dist_node = n_node
         return min_dist_node
 
+    def __del__(self):
+        for node in self.nodes:
+            del node
+        for node in self.rsus:
+            del node
+        for node in self.accidents:
+            del node
+
 
 def signal_handler(signum, frame):
     """
@@ -187,7 +210,7 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal_handler)
 
     # Simulation
-    simulation = Simulation(600, 600, 6, 3)
+    simulation = Simulation(600, 600, 6, 2)
 
     # Display Coordinates of nodes
     simulation.display_coordinates()

@@ -20,6 +20,7 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         msg = data['msg']
         if data["kind"] == 2:
             msg = decrypt_data(msg, self.server.node._private_key)
+        print("--------------------------------------------------------------------------")
         print(
             f"Node {self.request.getsockname()[1]} received {msg} from node {data['server_address'][1]}")
         # cur_thread = threading.current_thread()
@@ -45,6 +46,7 @@ def send_msg_func(recv_address, msg):
     try:
         sock.sendall(bytes(msg, 'ascii'))
         data = json.loads(msg)
+        print("--------------------------------------------------------------------------")
         print(
             f"Node {data['server_address'][1]} sent {data['msg']} to {recv_address[1]}")
         response = str(sock.recv(1024), 'ascii')

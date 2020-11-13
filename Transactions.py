@@ -19,25 +19,13 @@ pp = pprint.PrettyPrinter(indent=2)
 requestId = 0  # is automatically incremented at each request
 
 URL = 'http://localhost:8501'  # url of my geth node
-PATH_GENESIS = '/mnt/c/Users/gggui/Documents/VANET/VanetBlockChain/blockchain/genesis.json'
-# smart contract path
-PATH_SC_TRUFFLE = '/mnt/c/Users/gggui/Documents/VANET/VanetBlockChain/blockchain/python_code'
 
 # extracting data from the genesis file
+PATH_GENESIS = '/mnt/c/Users/gggui/Documents/VANET/VanetBlockChain/blockchain/genesis.json'
 genesisFile = json.load(open(PATH_GENESIS))
 CHAINID = genesisFile['config']['chainId']
 PERIOD = genesisFile['config']['clique']['period']
 GASLIMIT = int(genesisFile['gasLimit'], 0)
-
-# compile your smart contract with truffle first
-txnTruffleFile = json.load(
-    open(PATH_SC_TRUFFLE + '/build/contracts/TransactionContract.json'))
-txnAbi = txnTruffleFile['abi']
-txnBytecode = txnTruffleFile['bytecode']
-caTruffleFile = json.load(
-    open(PATH_SC_TRUFFLE + '/build/contracts/CAContract.json'))
-caAbi = caTruffleFile['abi']
-caBytecode = caTruffleFile['bytecode']
 
 # Don't share your private key !
 # address funded in genesis file
@@ -48,6 +36,17 @@ myPrivateKey = '0x3890a1911cb0492ed38605c334456dc4fbe598b318fc918602fa38d748c93d
 ''' =========================== SOME FUNCTIONS ============================ '''
 # see http://www.jsonrpc.org/specification
 # and https://github.com/ethereum/wiki/wiki/JSON-RPC
+
+def get_bytecode():
+    # smart contract path
+    PATH_SC_TRUFFLE = '/mnt/c/Users/gggui/Documents/VANET/VanetBlockChain/blockchain/python_code'
+
+    # compile your smart contract with truffle first
+    caTruffleFile = json.load(
+        open(PATH_SC_TRUFFLE + '/build/contracts/CAContract.json'))
+    caAbi = caTruffleFile['abi']
+    caBytecode = caTruffleFile['bytecode']
+    return caBytecode
 
 
 def createJSONRPCRequestObject(_method, _params, _requestId):
@@ -73,13 +72,14 @@ def deploy_contract(bytecode):
         'eth_getTransactionCount', [myAddress, 'latest'], requestId)
     responseObject = postJSONRPCRequestObject(URL, requestObject)
     myNonce = w3.toInt(hexstr=responseObject['result'])
+    print("--------------------------------------------------------------------------")
     print('nonce of address {} is {}'.format(myAddress, myNonce))
 
     # create your transaction
     transaction_dict = {'from': myAddress,
                         'to': '',  # empty address for deploying a new contract
                         'chainId': CHAINID,
-                        'gasPrice': 1,  # careful with gas price, gas price below the --gasprice option of Geth CLI will cause problems. I am running my node with --gasprice '1'
+                        'gasPrice': 2,  # careful with gas price, gas price below the --gasprice option of Geth CLI will cause problems. I am running my node with --gasprice '1'
                         'gas': 2000000,  # rule of thumb / guess work
                         'nonce': myNonce,
                         'data': bytecode}  # no constrctor in my smart contract so bytecode is enough
@@ -120,13 +120,16 @@ def deploy_contract(bytecode):
         print(responseObject['error'])
 
 
-def send_txn(senderId, receiverId, msg, contractAddress):
+def get_cur_nonce():
     global requestId
-    # get your nonce
     requestObject, requestId = createJSONRPCRequestObject('eth_getTransactionCount', [myAddress, 'latest'], requestId)
     responseObject = postJSONRPCRequestObject(URL, requestObject)
-    myNonce = w3.toInt(hexstr=responseObject['result'])
-    print('nonce of address {} is {}'.format(myAddress, myNonce))
+    return w3.toInt(hexstr=responseObject['result'])
+
+def send_txn(senderId, receiverId, msg, contractAddress, nonce):
+    global requestId
+    print("--------------------------------------------------------------------------")
+    print('nonce of address {} is {}'.format(myAddress, nonce))
 
     # prepare the data field of the transaction
     # function selector and argument encoding
@@ -140,7 +143,7 @@ def send_txn(senderId, receiverId, msg, contractAddress):
     # param3 = to_hex(msg)
     param1 = (senderId).to_bytes(32, byteorder='big').hex()
     param2 = (receiverId).to_bytes(32, byteorder='big').hex()
-    param3 = (msg).to_bytes(32, byteorder='big').hex()
+    param3 = (1).to_bytes(32, byteorder='big').hex()
     data = methodId + param1 + param2 + param3
 
     transaction_dict = {'from': myAddress,
@@ -149,7 +152,7 @@ def send_txn(senderId, receiverId, msg, contractAddress):
                         # careful with gas price, gas price below the threshold defined in the node config will cause all sorts of issues (tx not bieng broadcasted for example)
                         'gasPrice': 1,
                         'gas': 2000000,  # rule of thumb / guess work
-                        'nonce': myNonce,
+                        'nonce': nonce,
                         'data': data}
 
     # sign the transaction
@@ -175,6 +178,7 @@ def send_txn(senderId, receiverId, msg, contractAddress):
             receipt = responseObject['result']
             if(receipt is not None):
                 if(receipt['status'] == '0x1'):
+                    print("--------------------------------------------------------------------------")
                     print('transaction successfully mined')
                 else:
                     pp.pprint(responseObject)
@@ -186,9 +190,9 @@ def send_txn(senderId, receiverId, msg, contractAddress):
         print(responseObject['error'])
 
 
-if __name__ == "__main__":
-    contractAddress = deploy_contract(caBytecode)
-    send_txn(1, 2, 3, contractAddress)
+# if __name__ == "__main__":
+#     contractAddress = deploy_contract(caBytecode)
+#     send_txn(1, 2, 3, contractAddress)
 
 
 # ''' ============= READ YOUR SMART CONTRACT STATE USING GETTER  =============='''
