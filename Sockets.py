@@ -2,6 +2,7 @@ import socketserver
 import threading
 import socket
 import json
+from Functions import decrypt_data
 
 
 class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
@@ -16,8 +17,11 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
     def handle(self):
         data = str(self.request.recv(1024), 'ascii')
         data = json.loads(data)
+        msg = data['msg']
+        if data["kind"] == 2:
+            msg = decrypt_data(msg, self.server.node._private_key)
         print(
-            f"Node {self.request.getsockname()[1]} received {data['msg']} from node {data['server_address'][1]}")
+            f"Node {self.request.getsockname()[1]} received {msg} from node {data['server_address'][1]}")
         # cur_thread = threading.current_thread()
         # response = bytes(f"{data}", 'ascii')
         # self.request.sendall(response)
@@ -50,13 +54,14 @@ def send_msg_func(recv_address, msg):
         sock.close()
 
 
-def create_msg(server_address, msg):
+def create_msg(server_address, msg, kind=1):
     """
     Default message format for the socket communication
     """
     return json.dumps({
         "server_address": server_address,
-        "msg": msg
+        "msg": msg,
+        "kind": kind
     })
 
 
